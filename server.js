@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const port = process.env.PORT || 4000;
 
@@ -34,7 +34,7 @@ async function run() {
     //   res.send(products);
     // });
 
-    // API Make for pagination
+    // API Make for pagination and also get data from database
       app.get("/products", async (req, res) => {
       const page = req.query.page;
       const size = parseInt(req.query.size);
@@ -44,6 +44,17 @@ async function run() {
       const count = await laptopBdDatabase.estimatedDocumentCount();
       res.send({products,count});
     });
+
+    // API Make for OrderBox by using ID (67-3)
+     app.get('/products/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const order = await laptopBdDatabase.findOne(query);
+      res.send(order);
+     })
+
+   
+
 
   } finally {
 
