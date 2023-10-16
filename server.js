@@ -25,6 +25,8 @@ async function run() {
   try {
     // Connect mongodb database with local server
     const laptopBdDatabase = client.db("laptobBddata").collection("products");
+    const ordersDatabase = client.db("laptobBddata").collection("orders");
+
 
     // Get all Data from the database and send client server
     // app.get("/products", async (req, res) => {
@@ -53,8 +55,17 @@ async function run() {
       res.send(order);
      })
 
-   
+    // Orders API
 
+    // This order API Link to us Front-end OrderBox and receive data from font-end and also send data Database 
+    app.post('/orders', async(req,res)=>{
+      const order = req.body;
+      const result = ordersDatabase.insertOne(order)
+      res.send(result);
+    })
+
+
+   
 
   } finally {
 
