@@ -58,7 +58,7 @@ async function run() {
       const order = await laptopBdDatabase.findOne(query);
       res.send(order);
     });
-
+/*--------------------------------------*/
     // Users API
     // This API User for data send usersDatabase
     app.post("/users", async (req, res) => {
@@ -66,7 +66,36 @@ async function run() {
       const userData = usersDatabase.insertOne(user);
       res.send(userData);
     });
- 
+    // Api for Load user Data allUsers of front-end
+    app.get("/users", async(req,res)=>{
+      const query = {};
+      const cursor = usersDatabase.find(query);
+      const allUser = await cursor.toArray();
+      res.send(allUser);
+    });
+
+     // Delete Users from AllUser dashboard
+     app.delete("/users/:id", async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await usersDatabase.deleteOne(query);
+      res.send(result)
+    });
+  // Make admin
+   app.put('/users/admin/:id',async(req,res)=>{
+    const id = req.params.id;
+    const filter = {_id: new ObjectId(id)}
+    const options = {upsert: true};
+    const updateDoc = {
+      $set:{
+        role: 'admin'
+      }
+    };
+    const result = await usersDatabase.updateOne(filter,updateDoc,options);
+    res.send(result);
+   })
+
+ /*--------------------------------------*/
     // Orders API
 
     // This order API Link to us Front-end OrderBox and receive data from font-end and also send data Database
@@ -92,7 +121,7 @@ async function run() {
       res.send(result)
 
     });
-  
+  /*--------------------------------------*/
   
   } finally {
   }
