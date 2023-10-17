@@ -27,7 +27,6 @@ async function run() {
     const laptopBdDatabase = client.db("laptobBddata").collection("products");
     const ordersDatabase = client.db("laptobBddata").collection("orders");
 
-
     // Get all Data from the database and send client server
     // app.get("/products", async (req, res) => {
     //   const query = {};
@@ -37,38 +36,55 @@ async function run() {
     // });
 
     // API Make for pagination and also get data from database
-      app.get("/products", async (req, res) => {
+    app.get("/products", async (req, res) => {
       const page = req.query.page;
       const size = parseInt(req.query.size);
       const query = {};
       const cursor = laptopBdDatabase.find(query);
-      const products = await cursor.skip(page*size).limit(size).toArray();
+      const products = await cursor
+        .skip(page * size)
+        .limit(size)
+        .toArray();
       const count = await laptopBdDatabase.estimatedDocumentCount();
-      res.send({products,count});
+      res.send({ products, count });
     });
 
     // API Make for OrderBox by using ID (67-3)
-     app.get('/products/:id',async(req,res)=>{
+    app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const order = await laptopBdDatabase.findOne(query);
       res.send(order);
-     })
+    });
 
     // Orders API
 
-    // This order API Link to us Front-end OrderBox and receive data from font-end and also send data Database 
-    app.post('/orders', async(req,res)=>{
+    // This order API Link to us Front-end OrderBox and receive data from font-end and also send data Database
+    app.post("/orders", async (req, res) => {
       const order = req.body;
-      const result = ordersDatabase.insertOne(order)
+      const result = ordersDatabase.insertOne(order);
       res.send(result);
-    })
+    });
 
+    // Get API for Load Cart make a cart table
+    app.get("/orders", async (req, res) => {
+      const query = {};
+      const cursor = ordersDatabase.find(query);
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
 
-   
+    // Remove Order from cart
+      app.delete("/orders/:id", async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await ordersDatabase.deleteOne(query);
+      res.send(result)
 
+    });
+  
+  
   } finally {
-
   }
 }
 run().catch(console.dir);
